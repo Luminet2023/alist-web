@@ -79,3 +79,43 @@ const iconMap = {
   css: BiSolidFileCss,
   html: BiSolidFileHtml,
 }
+export const getIconByTypeAndExt = (type: number, ext: string) => {
+  if (type !== ObjType.FOLDER) {
+    for (const [extensions, icon] of Object.entries(iconMap)) {
+      if (extensions.split(",").includes(ext.toLowerCase())) {
+        return icon
+      }
+    }
+  }
+  switch (type) {
+    case ObjType.FOLDER:
+      return IoFolder
+    // case ObjType.OFFICE: {
+    //   if (ext === "doc" || ext === "docx") {
+    //     return BsFileEarmarkWordFill;
+    //   }
+    //   if (ext === "xls" || ext === "xlsx") {
+    //     return BsFileEarmarkExcelFill;
+    //   }
+    //   if (ext === "ppt" || ext === "pptx") {
+    //     return BsFileEarmarkPptFill;
+    //   } else {
+    //     return BsFileEarmarkPdfFill;
+    //   }
+    // }
+    case ObjType.VIDEO:
+      return BsFileEarmarkPlayFill
+    case ObjType.AUDIO:
+      return BsFileEarmarkMusicFill
+    case ObjType.TEXT:
+      return BsFileEarmarkFontFill
+    case ObjType.IMAGE:
+      return BsFileEarmarkImageFill
+    default:
+      return BsFileEarmarkMinusFill
+  }
+}
+
+export const getIconByObj = (obj: Pick<Obj, "type" | "name">) => {
+  return getIconByTypeAndExt(obj.type, ext(obj.name))
+}
