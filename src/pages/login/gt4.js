@@ -1,5 +1,4 @@
-"v4.1.8 Geetest Inc."
-;(function (window) {
+(function (window) {
   "use strict"
   if (typeof window === "undefined") {
     throw new Error("Geetest requires browser environment")
