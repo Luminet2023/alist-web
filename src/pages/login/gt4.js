@@ -1,4 +1,3 @@
-"v4.1.8 Geetest Inc."
 ;(function (window) {
   "use strict"
   if (typeof window === "undefined") {
