@@ -41,13 +41,14 @@ import {
   CredentialRequestOptionsJSON,
 } from "@github/webauthn-json/browser-ponyfill"
 import "./gt4.js"
-declare const initGeetest: any
+import "./ui.css"
+declare const initGeetest4: any
 const Login = () => {
   const logos = getSetting("logo").split("\n")
   const logo = useColorModeValue(logos[0], logos.pop())
   const t = useT()
   const title = createMemo(() => {
-    return `${t("login.login_to")} ${getSetting("site_title")}`
+    return `${getSetting("site_title")}`
   })
   useTitle(title)
   const bgColor = useColorModeValue("white", "$neutral1")
@@ -73,17 +74,20 @@ const Login = () => {
           // geetest_seccode:result.geetest_seccode,
           // geetest_validate:result.geetest_validate,
           // geetest_challenge:result.geetest_challenge,
-          lot_number: result.lot_number,
+          // lot_number: result.lot_number,
           captcha_output: result.captcha_output,
           pass_token: result.pass_token,
           gen_time: result.gen_time,
           sign_token: result.sign_token,
         })
       } else {
-        return r.post("/auth/login/verify_captcha", {
+        return r.post("/auth/login/hash", {
           username: username(),
           password: hashPwd(password()),
           otp_code: opt(),
+          // geetest_seccode:result.geetest_seccode,
+          // geetest_validate:result.geetest_validate,
+          // geetest_challenge:result.geetest_challenge,
           lot_number: result.lot_number,
           captcha_output: result.captcha_output,
           pass_token: result.pass_token,
@@ -191,26 +195,30 @@ const Login = () => {
   if (ldapLoginEnabled) {
     setUseLdap(true)
   }
-  // let load: boolean = false;
-  // const captcha = () => {
-  //  initGeetest4({
-  //    captchaId: 'ddd701191607e83c9d8d87020099d5aa',
-  //    product:'popup'
-  //  }, function (captcha: any) {
-  //    // captcha 为验证码实例
-  //    captcha.appendTo("#captcha");
-  //    captcha.onReady(function(){
-
-  //   }).onSuccess(function(){
-  //     let result = captcha.getValidate();
-  //     console.log(result)
-  //     localStorage.setItem("captcha",JSON.stringify(result))
-  //     Login()
-  //   }).onError(function(){
-  //     notify.error("肥鸡验证失败")
-  //   })
-  // })
-  //  };
+  let load: boolean = false
+  const captcha = () => {
+    initGeetest4(
+      {
+        captchaId: "ddd701191607e83c9d8d87020099d5aa",
+        product: "popup",
+      },
+      function (captcha: any) {
+        // captcha 为验证码实例
+        captcha.appendTo("#captcha")
+        captcha
+          .onReady(function () {})
+          .onSuccess(function () {
+            let result = captcha.getValidate()
+            console.log(result)
+            localStorage.setItem("captcha", JSON.stringify(result))
+            Login()
+          })
+          .onError(function () {
+            notify.error("肥鸡验证失败")
+          })
+      },
+    )
+  }
 
   interface GeetestData {
     new_captcha: boolean
@@ -237,55 +245,55 @@ const Login = () => {
     }
   }
 
-  const captcha = () => {
-    const apiUrl = api + "/api/auth/create_mmt"
-    fetchData(apiUrl)
-      .then((data: GeetestData) => {
-        const geetestConfig: GeetestConfig = {
-          gt: data.gt,
-          challenge: data.challenge,
-          offline: !data.success,
-          new_captcha: data.new_captcha,
-        }
+  // const captcha = () => {
+  //   const apiUrl = api + "/api/auth/create_challenge"
+  //   fetchData(apiUrl)
+  //     .then((data: GeetestData) => {
+  //       const geetestConfig: GeetestConfig = {
+  //         gt: data.gt,
+  //         challenge: data.challenge,
+  //         offline: !data.success,
+  //         new_captcha: data.new_captcha,
+  //       }
 
-        // 初始化 Geetest
-        initGeetest(
-          geetestConfig,
-          (captcha: {
-            appendTo: (arg0: string) => void
-            onReady: (arg0: () => void) => {
-              (): any
-              new (): any
-              onSuccess: {
-                (arg0: () => void): {
-                  (): any
-                  new (): any
-                  onError: { (arg0: () => void): void; new (): any }
-                }
-                new (): any
-              }
-            }
-            getValidate: () => any
-          }) => {
-            captcha.appendTo("#captcha")
-            captcha
-              .onReady(function () {})
-              .onSuccess(function () {
-                let result = captcha.getValidate()
-                console.log(result)
-                localStorage.setItem("captcha", JSON.stringify(result))
-                Login()
-              })
-              .onError(function () {
-                notify.error("肥鸡验证失败")
-              })
-          },
-        )
-      })
-      .catch((error) => {
-        notify.error("肥鸡验证失败")
-      })
-  }
+  //       // 初始化 Geetest
+  //       initGeetest(
+  //         geetestConfig,
+  //         (captcha: {
+  //           appendTo: (arg0: string) => void
+  //           onReady: (arg0: () => void) => {
+  //             (): any
+  //             new (): any
+  //             onSuccess: {
+  //               (arg0: () => void): {
+  //                 (): any
+  //                 new (): any
+  //                 onError: { (arg0: () => void): void; new (): any }
+  //               }
+  //               new (): any
+  //             }
+  //           }
+  //           getValidate: () => any
+  //         }) => {
+  //           captcha.appendTo("#captcha")
+  //           captcha
+  //             .onReady(function () {captcha})
+  //             .onSuccess(function () {
+  //               let result = captcha.getValidate()
+  //               console.log(result)
+  //               localStorage.setItem("captcha", JSON.stringify(result))
+  //               Login()
+  //             })
+  //             .onError(function () {
+  //               notify.error("肥鸡验证失败")
+  //             })
+  //         },
+  //       )
+  //     })
+  //     .catch((error) => {
+  //       notify.error("肥鸡验证失败")
+  //     })
+  // }
 
   return (
     <Center zIndex="1" w="$full" h="100vh">
@@ -411,8 +419,9 @@ const Login = () => {
               true,
             )
           }}
-        ></Button>
-        {t("login.use_guest")}
+        >
+          {t("login.use_guest")}
+        </Button>
         <div id="captcha"></div>
         <Flex
           mt="$2"

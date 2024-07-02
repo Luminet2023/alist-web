@@ -81,9 +81,9 @@ const App: Component = () => {
         fallback={
           <Routes base={base_path}>
             <Route path="/@test" component={Test} />
-            <Route path="/@login" component={Login} />
+            <Route path="//login" component={Login} />
             <Route
-              path="/@manage/*"
+              path="//manage/*"
               element={
                 <MustUser>
                   <Manage />

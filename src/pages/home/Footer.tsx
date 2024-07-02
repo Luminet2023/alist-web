@@ -9,18 +9,18 @@ export const Footer = () => {
   const t = useT()
   return (
     <VStack class="footer" w="$full" py="$4">
-      <HStack spacing="$1">
+      {/* <HStack spacing="$1">
         <Anchor href="https://github.com/alist-org/alist" external>
           {t("home.footer.powered_by")}
         </Anchor>
         <span>|</span>
         <AnchorWithBase
           as={Link}
-          href={UserMethods.is_guest(me()) ? "/@login" : "/@manage"}
+          href={UserMethods.is_guest(me()) ? "//login" : "//manage"}
         >
           {t(UserMethods.is_guest(me()) ? "login.login" : "home.footer.manage")}
         </AnchorWithBase>
-      </HStack>
+      </HStack> */}
     </VStack>
   )
 }

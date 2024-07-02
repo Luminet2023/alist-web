@@ -24,11 +24,15 @@ import {
   VStack,
   Switch as HopeSwitch,
 } from "@hope-ui/solid"
+import { AnchorWithBase } from "~/components"
 import { For, Match, onCleanup, Switch } from "solid-js"
 import { SwitchLanguageWhite, SwitchColorMode } from "~/components"
 import { useT } from "~/hooks"
 import { initialLocalSettings, local, LocalSetting, setLocal } from "~/store"
 import { bus } from "~/utils"
+import { Link } from "@solidjs/router"
+import { me } from "~/store"
+import { UserMethods } from "~/types"
 
 function LocalSettingEdit(props: LocalSetting) {
   const t = useT()
@@ -121,6 +125,16 @@ export const LocalSettings = () => {
             <HStack spacing="$4" p="$2" color="$neutral11">
               <SwitchLanguageWhite />
               <SwitchColorMode />
+              <AnchorWithBase
+                as={Link}
+                href={UserMethods.is_guest(me()) ? "//login" : "//manage"}
+              >
+                {t(
+                  UserMethods.is_guest(me())
+                    ? "login.login"
+                    : "home.footer.manage",
+                )}
+              </AnchorWithBase>
             </HStack>
           </Center>
         </DrawerBody>

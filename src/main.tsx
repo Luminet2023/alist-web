@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { Router } from "@solidjs/router"
 import { render } from "solid-js/web"
-
+import "./ui.css"
 import { Index } from "./app"
 
 declare global {
