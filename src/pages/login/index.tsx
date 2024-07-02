@@ -24,6 +24,9 @@ import {
   handleResp,
   hashPwd,
 } from "~/utils"
+import axios from "axios"
+import { api, log } from "~/utils"
+import { getMainColor } from "~/store"
 import { PResp, Resp } from "~/types"
 import LoginBg from "./LoginBg"
 import { createStorageSignal } from "@solid-primitives/storage"
@@ -37,7 +40,8 @@ import {
   supported,
   CredentialRequestOptionsJSON,
 } from "@github/webauthn-json/browser-ponyfill"
-
+import "./gt4.js"
+declare const initGeetest: any
 const Login = () => {
   const logos = getSetting("logo").split("\n")
   const logo = useColorModeValue(logos[0], logos.pop())
@@ -59,17 +63,32 @@ const Login = () => {
   const [useLdap, setUseLdap] = createSignal(false)
   const [loading, data] = useFetch(
     async (): Promise<Resp<{ token: string }>> => {
+      const storedCaptcha = localStorage.getItem("captcha")
+      const result = storedCaptcha ? JSON.parse(storedCaptcha) : null
       if (useLdap()) {
         return r.post("/auth/login/ldap", {
           username: username(),
           password: password(),
           otp_code: opt(),
+          // geetest_seccode:result.geetest_seccode,
+          // geetest_validate:result.geetest_validate,
+          // geetest_challenge:result.geetest_challenge,
+          lot_number: result.lot_number,
+          captcha_output: result.captcha_output,
+          pass_token: result.pass_token,
+          gen_time: result.gen_time,
+          sign_token: result.sign_token,
         })
       } else {
-        return r.post("/auth/login/hash", {
+        return r.post("/auth/login/verify_captcha", {
           username: username(),
           password: hashPwd(password()),
           otp_code: opt(),
+          lot_number: result.lot_number,
+          captcha_output: result.captcha_output,
+          pass_token: result.pass_token,
+          gen_time: result.gen_time,
+          sign_token: result.sign_token,
         })
       }
     },
@@ -172,6 +191,101 @@ const Login = () => {
   if (ldapLoginEnabled) {
     setUseLdap(true)
   }
+  // let load: boolean = false;
+  // const captcha = () => {
+  //  initGeetest4({
+  //    captchaId: 'ddd701191607e83c9d8d87020099d5aa',
+  //    product:'popup'
+  //  }, function (captcha: any) {
+  //    // captcha 为验证码实例
+  //    captcha.appendTo("#captcha");
+  //    captcha.onReady(function(){
+
+  //   }).onSuccess(function(){
+  //     let result = captcha.getValidate();
+  //     console.log(result)
+  //     localStorage.setItem("captcha",JSON.stringify(result))
+  //     Login()
+  //   }).onError(function(){
+  //     notify.error("肥鸡验证失败")
+  //   })
+  // })
+  //  };
+
+  interface GeetestData {
+    new_captcha: boolean
+    gt: string
+    challenge: string
+    success: boolean
+  }
+
+  interface GeetestConfig {
+    gt: string
+    challenge: string
+    offline: boolean
+    new_captcha: boolean
+    api_server?: string
+  }
+
+  async function fetchData(url: string): Promise<GeetestData> {
+    try {
+      const response = await axios.get(url)
+      return response.data as GeetestData
+    } catch (error: any) {
+      notify.error(error)
+      throw error
+    }
+  }
+
+  const captcha = () => {
+    const apiUrl = api + "/api/auth/create_mmt"
+    fetchData(apiUrl)
+      .then((data: GeetestData) => {
+        const geetestConfig: GeetestConfig = {
+          gt: data.gt,
+          challenge: data.challenge,
+          offline: !data.success,
+          new_captcha: data.new_captcha,
+        }
+
+        // 初始化 Geetest
+        initGeetest(
+          geetestConfig,
+          (captcha: {
+            appendTo: (arg0: string) => void
+            onReady: (arg0: () => void) => {
+              (): any
+              new (): any
+              onSuccess: {
+                (arg0: () => void): {
+                  (): any
+                  new (): any
+                  onError: { (arg0: () => void): void; new (): any }
+                }
+                new (): any
+              }
+            }
+            getValidate: () => any
+          }) => {
+            captcha.appendTo("#captcha")
+            captcha
+              .onReady(function () {})
+              .onSuccess(function () {
+                let result = captcha.getValidate()
+                console.log(result)
+                localStorage.setItem("captcha", JSON.stringify(result))
+                Login()
+              })
+              .onError(function () {
+                notify.error("肥鸡验证失败")
+              })
+          },
+        )
+      })
+      .catch((error) => {
+        notify.error("肥鸡验证失败")
+      })
+  }
 
   return (
     <Center zIndex="1" w="$full" h="100vh">
@@ -266,7 +380,15 @@ const Login = () => {
               {t("login.clear")}
             </Button>
           </Show>
-          <Button w="$full" loading={loading()} onClick={Login}>
+          <Button
+            w="$full"
+            loading={loading()}
+            class="g-recaptcha"
+            data-sitekey="reCAPTCHA_site_key"
+            data-callback="onSubmit"
+            data-action="submit"
+            onclick={captcha}
+          >
             {t("login.login")}
           </Button>
         </HStack>
@@ -289,9 +411,9 @@ const Login = () => {
               true,
             )
           }}
-        >
-          {t("login.use_guest")}
-        </Button>
+        ></Button>
+        {t("login.use_guest")}
+        <div id="captcha"></div>
         <Flex
           mt="$2"
           justifyContent="space-evenly"
@@ -306,6 +428,7 @@ const Login = () => {
             <Icon
               cursor="pointer"
               boxSize="$8"
+              color={getMainColor()}
               as={IoFingerPrint}
               p="$0_5"
               onclick={AuthnSwitch}
