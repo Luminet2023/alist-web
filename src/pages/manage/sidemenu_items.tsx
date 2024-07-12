@@ -21,7 +21,7 @@ import { IoCopy, IoHome, IoMagnetOutline } from "solid-icons/io"
 import { Component, lazy } from "solid-js"
 import { Group, UserRole } from "~/types"
 import { FaSolidBook, FaSolidDatabase } from "solid-icons/fa"
-
+import { AiFillSafetyCertificate } from "solid-icons/ai"
 export type SideMenuItem = SideMenuItemProps & {
   component?: Component
   children?: SideMenuItem[]
@@ -89,6 +89,12 @@ export const side_menu_items: SideMenuItem[] = [
         icon: BsMedium,
         to: "//manage/settings/other",
         component: lazy(() => import("./settings/Other")),
+      },
+      {
+        title: "Geetest",
+        icon: AiFillSafetyCertificate,
+        to: "//manage/settings/geetest",
+        component: lazy(() => import("./settings/geetest")),
       },
     ],
   },

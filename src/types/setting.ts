@@ -11,6 +11,7 @@ export enum Group {
   SSO,
   LDAP,
   S3,
+  GEETEST,
 }
 export enum Flag {
   PUBLIC,
@@ -27,4 +28,7 @@ export interface SettingItem {
   options?: string
   group: Group
   flag: Flag
+}
+export interface Geetest {
+  disabled: boolean
 }

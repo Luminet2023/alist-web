@@ -55,6 +55,21 @@ const Login = () => {
   const [username, setUsername] = createSignal(
     localStorage.getItem("username") || "",
   )
+  const [lot_number, setlot_number] = createSignal(
+    localStorage.getItem("lot_number") || "",
+  )
+  const [captcha_output, setcaptcha_output] = createSignal(
+    localStorage.getItem("captcha_output") || "",
+  )
+  const [pass_token, setpass_token] = createSignal(
+    localStorage.getItem("pass_token") || "",
+  )
+  const [gen_time, setgen_time] = createSignal(
+    localStorage.getItem("gen_time") || "",
+  )
+  const [sign_token, setsign_token] = createSignal(
+    localStorage.getItem("sign_token") || "",
+  )
   const [password, setPassword] = createSignal(
     localStorage.getItem("password") || "",
   )
@@ -75,10 +90,6 @@ const Login = () => {
           // geetest_validate:result.geetest_validate,
           // geetest_challenge:result.geetest_challenge,
           // lot_number: result.lot_number,
-          captcha_output: result.captcha_output,
-          pass_token: result.pass_token,
-          gen_time: result.gen_time,
-          sign_token: result.sign_token,
         })
       } else {
         return r.post("/auth/login/hash", {
@@ -88,11 +99,11 @@ const Login = () => {
           // geetest_seccode:result.geetest_seccode,
           // geetest_validate:result.geetest_validate,
           // geetest_challenge:result.geetest_challenge,
-          lot_number: result.lot_number,
-          captcha_output: result.captcha_output,
-          pass_token: result.pass_token,
-          gen_time: result.gen_time,
-          sign_token: result.sign_token,
+          lot_number: lot_number(),
+          captcha_output: captcha_output(),
+          pass_token: pass_token(),
+          gen_time: gen_time(),
+          sign_token: sign_token(),
         })
       }
     },
@@ -261,8 +272,11 @@ const Login = () => {
                 .onReady(function () {})
                 .onSuccess(function () {
                   let result = captcha.getValidate()
-                  console.log(result)
-                  localStorage.setItem("captcha", JSON.stringify(result))
+                  setlot_number(result.lot_number)
+                  setcaptcha_output(result.captcha_output)
+                  setpass_token(result.pass_token)
+                  setgen_time(result.gen_time)
+                  setsign_token(result.sign_token)
                   Login()
                 })
                 .onError(function () {
