@@ -233,6 +233,7 @@ const Login = () => {
 
   interface GeetestData {
     need_captcha: boolean
+    captchaId: string
     new_captcha: boolean
     gt: string
     challenge: string
@@ -262,14 +263,16 @@ const Login = () => {
         if (data.need_captcha === true) {
           initGeetest4(
             {
-              captchaId: "ddd701191607e83c9d8d87020099d5aa",
-              product: "popup",
+              captchaId: data.captchaId,
+              product: "bind",
             },
             function (captcha: any) {
               // captcha 为验证码实例
               captcha.appendTo("#captcha")
               captcha
-                .onReady(function () {})
+                .onReady(function () {
+                  captcha.showCaptcha()
+                })
                 .onSuccess(function () {
                   let result = captcha.getValidate()
                   setlot_number(result.lot_number)
@@ -373,7 +376,7 @@ const Login = () => {
               onInput={(e) => setOpt(e.currentTarget.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  Login()
+                  captcha()
                 }
               }}
             />
@@ -394,7 +397,7 @@ const Login = () => {
               onInput={(e) => setPassword(e.currentTarget.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  Login()
+                  captcha()
                 }
               }}
             />
