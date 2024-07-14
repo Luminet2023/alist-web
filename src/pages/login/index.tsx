@@ -207,29 +207,6 @@ const Login = () => {
     setUseLdap(true)
   }
   let load: boolean = false
-  // const captcha = () => {
-  //   initGeetest4(
-  //     {
-  //       captchaId: "ddd701191607e83c9d8d87020099d5aa",
-  //       product: "popup",
-  //     },
-  //     function (captcha: any) {
-  //       // captcha 为验证码实例
-  //       captcha.appendTo("#captcha")
-  //       captcha
-  //         .onReady(function () {})
-  //         .onSuccess(function () {
-  //           let result = captcha.getValidate()
-  //           console.log(result)
-  //           localStorage.setItem("captcha", JSON.stringify(result))
-  //           Login()
-  //         })
-  //         .onError(function () {
-  //           notify.error("肥鸡验证失败")
-  //         })
-  //     },
-  //   )
-  // }
 
   interface GeetestData {
     need_captcha: boolean
