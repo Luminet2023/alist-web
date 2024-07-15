@@ -3,9 +3,7 @@ import { Markdown, MaybeLoading } from "~/components"
 import { useT, useManageTitle } from "~/hooks"
 
 const fetchReadme = async () =>
-  await (
-    await fetch("https://jsd.nn.ci/gh/alist-org/alist@main/README.md")
-  ).text()
+  await (await fetch("https://webstatic.luminet.cn/alist/README.md")).text()
 
 const About = () => {
   const t = useT()

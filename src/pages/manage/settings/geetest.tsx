@@ -13,11 +13,14 @@ import { Group, SettingItem, PResp, Geetest } from "~/types"
 import { handleResp, notify, r } from "~/utils"
 import { Item } from "./SettingItem"
 import { createStore } from "solid-js/store"
+import { setuid } from "process"
+import axios from "axios"
 
 const OtherSettings = () => {
   const t = useT()
   useManageTitle("manage.sidemenu.other")
   const [uri, setUri] = createSignal("")
+  const [user, setUser] = createSignal("")
   const [secret, setSecret] = createSignal("")
   const [GeetestEnabled, setGeetestEnabled] = createSignal("")
   const [qbitUrl, setQbitUrl] = createSignal("")
@@ -30,11 +33,12 @@ const OtherSettings = () => {
   )
   const [setAria2Loading, setAria2] = useFetch(
     (): PResp<string> =>
-      r.post("/admin/setting/set_geetest", {
+      r.post("/admin/user/del_cache", {
         Uri: uri(),
-        Secret: secret(),
-        GeetestEnabled: GeetestEnabled(),
       }),
+  )
+  const [setDelUserName, DEL_TOKEN] = useFetch(
+    (): PResp<string> => r.post("/admin/user/del_cache?username=" + user(), {}),
   )
   const refresh = async () => {
     const resp = await settingsData()
@@ -86,11 +90,28 @@ const OtherSettings = () => {
         onClick={async () => {
           const resp = await setAria2()
           handleResp(resp, (data) => {
-            notify.success(`${t("settings_other.aria2_version")} ${data}`)
+            notify.success(`${t("success")}`)
           })
         }}
       >
         {t("settings_other.set_aria2")}
+      </Button>
+      <Item
+        {...settings().find((i) => i.help === "")!}
+        value={""}
+        onChange={(str) => setUser(str)}
+      />
+      <Button
+        my="$2"
+        loading={setDelUserName()}
+        onClick={async () => {
+          const resp = await DEL_TOKEN()
+          handleResp(resp, (data) => {
+            notify.success(`${t("success")}`)
+          })
+        }}
+      >
+        {t("清除登录态")}
       </Button>
     </MaybeLoading>
   )
